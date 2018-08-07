@@ -10,9 +10,9 @@ const bold_font = 'OpenSans-Bold';
 const base_font_size = 7;
 const label_font_size = 7 - 2;
 const cols = [
-    30 // first addressing column
-  , 310 // second addressing column
-  , 421 // invoice date label];
+    30, // first addressing column
+    310, // second addressing column
+    421, // invoice date label];
 ];
 
 const write_row = (doc, position, start, values) => {
@@ -23,7 +23,7 @@ const write_row = (doc, position, start, values) => {
         const width = value.width || 60;
         const options = {
             width: width,
-            align: value.align || 'center'
+            align: value.align || 'center',
         };
         if (value.bold) {
             doc.font(bold_font);
@@ -55,7 +55,7 @@ const table_header = (doc, position, header) => {
     const label_english = header.map(col => ({
         text: col.label_en,
         width: col.width,
-        align: col.align
+        align: col.align,
     }));
     position = write_row(doc, position, cols[0], label_english);
 
@@ -64,7 +64,7 @@ const table_header = (doc, position, header) => {
     const label_polish = header.map(col => ({
         text: col.label,
         width: col.width,
-        align: col.align
+        align: col.align,
     }));
     position = write_row(doc, position, cols[0], label_polish);
 
@@ -77,8 +77,8 @@ const vat_summary_row = (doc, position, header, row) => {
         {
             text: row.vatRate === '-1' ? 'Total charges with no VAT' : `Total charges with ${row.vatRate}% VAT`,
             width: array_sum(header.slice(0, 4).map(x => x.width || 60)),
-            align: 'left'
-        }
+            align: 'left',
+        },
     ]);
     doc.fontSize(base_font_size);
     const content = [
@@ -86,28 +86,28 @@ const vat_summary_row = (doc, position, header, row) => {
             text: row.vatRate === '-1' ? 'Wartość usług nie podlegających VAT' : `Wartość usług podlegających VAT ${row.vatRate}%`,
             width: array_sum(header.slice(0, 4).map(x => x.width || 60)),
             align: 'left',
-            bold: true
+            bold: true,
         },
         {
             text: row.netto.toFixed(2),
             width: header[4].width,
-            align: 'right'
+            align: 'right',
         },
         {
             text: row.vatRate === '-1' ? 'np' : `${row.vatRate} %`,
             width: header[4].width,
-            align: 'center'
+            align: 'center',
         },
         {
             text: row.vatAmount.toFixed(2),
             width: header[4].width,
-            align: 'right'
+            align: 'right',
         },
         {
             text: row.brutto.toFixed(2),
             width: header[4].width,
-            align: 'right'
-        }
+            align: 'right',
+        },
     ];
     position = write_row(doc, position, cols[0], content);
     return position;
@@ -119,8 +119,8 @@ const summary_row = (doc, position, header, invoice) => {
         {
             text: 'Total',
             width: 60,
-            align: 'left'
-        }
+            align: 'left',
+        },
     ]);
     doc.fontSize(base_font_size);
 
@@ -129,28 +129,28 @@ const summary_row = (doc, position, header, invoice) => {
             text: 'Razem',
             width: array_sum(header.slice(0, 4).map(x => x.width || 60)),
             align: 'left',
-            bold: true
+            bold: true,
         },
         {
             text: array_sum(invoice.items.map(x => parseFloat(x.netto))).toFixed(2),
             width: header[4].width,
-            align: 'right'
+            align: 'right',
         },
         {
             text: ' ',
             width: header[4].width,
-            align: 'right'
+            align: 'right',
         },
         {
             text: array_sum(invoice.items.map(x => parseFloat(x.vatAmount))).toFixed(2),
             width: header[4].width,
-            align: 'right'
+            align: 'right',
         },
         {
             text: array_sum(invoice.items.map(x => parseFloat(x.brutto))).toFixed(2),
             width: header[4].width,
-            align: 'right'
-        }
+            align: 'right',
+        },
     ];
     position = write_row(doc, position, cols[0], sum_row);
     return position;
@@ -165,7 +165,7 @@ const summaryVAT = (invoice) => invoice.items.reduce((acc, cur) => {
             vatRate: cur.vatRate,
             netto: parseFloat(cur.netto),
             vatAmount: parseFloat(cur.vatAmount),
-            brutto: parseFloat(cur.brutto)
+            brutto: parseFloat(cur.brutto),
         });
     }
     return acc;
@@ -177,39 +177,39 @@ const table_content = (doc, position, invoice) => {
             label: 'Lp.',
             width: 20,
             label_en: '#',
-            align: 'left'
+            align: 'left',
         },
         {
             label: 'Nazwa pozycji',
             label_en: 'Description',
             width: 150,
-            align: 'left'
+            align: 'left',
         },
         {
             label: 'Ilość',
-            label_en: 'Quantity'
+            label_en: 'Quantity',
         },
         {
             label: 'Cena netto',
-            label_en: 'Price net'
+            label_en: 'Price net',
         },
         {
             label: 'Wartość netto',
-            label_en: 'Value net'
+            label_en: 'Value net',
         },
         {
             label: 'Stawka VAT',
-            label_en: 'VAT rate'
+            label_en: 'VAT rate',
         },
         {
             label: 'Kwota VAT',
-            label_en: 'VAT Amount'
+            label_en: 'VAT Amount',
         },
         {
             label: 'Wartość brutto',
             label_en: 'Value gross',
-            align: 'right'
-        }
+            align: 'right',
+        },
     ];
 
     doc.fontSize(label_font_size).font(regular_font);
@@ -221,39 +221,39 @@ const table_content = (doc, position, invoice) => {
     invoice.items.forEach((item, index) => {
         const data = [
             {
-                value: index + 1
+                value: index + 1,
             },
             {
-                value: Array.isArray(item.name) ? item.name.join('\n') : item.name
+                value: Array.isArray(item.name) ? item.name.join('\n') : item.name,
             },
             {
-                value: item.quantity
+                value: item.quantity,
             },
             {
                 value: parseFloat(item.price).toFixed(2),
-                align: 'right'
+                align: 'right',
             },
             {
                 value: parseFloat(item.netto).toFixed(2),
-                align: 'right'
+                align: 'right',
             },
             {
                 value: item.vatRate !== '-1' ? `${item.vatRate} %` : 'np',
-                align: 'center'
+                align: 'center',
             },
             {
                 value: parseFloat(item.vatAmount).toFixed(2),
-                align: 'right'
+                align: 'right',
             },
             {
                 value: parseFloat(item.brutto).toFixed(2),
-                align: 'right'
-            }
+                align: 'right',
+            },
         ];
         const row = data.map((col, index) => ({
             text: col.value,
             width: header[index].width,
-            align: col.align || header[index].align
+            align: col.align || header[index].align,
         }));
         position = write_row(doc, position, cols[0], row);
         position = horizontal_line(doc, position, array_sum(header.map(x => x.width || 60)));
@@ -286,7 +286,7 @@ const addressing = (doc, position, invoice) => {
         `${invoice.seller.company}`,
         `ul. ${invoice.seller.address.street}`,
         `${invoice.seller.address.zipcode} ${invoice.seller.address.city}, ${invoice.seller.address.country}`,
-        `NIP: ${invoice.seller.nip}`
+        `NIP: ${invoice.seller.nip}`,
     ];
     doc.text(seller_lines.join('\n'), cols[0], position);
 
@@ -295,7 +295,7 @@ const addressing = (doc, position, invoice) => {
         `${invoice.buyer.company}`,
         `ul. ${invoice.buyer.address.street}`,
         `${invoice.buyer.address.zipcode} ${invoice.buyer.address.city}, ${invoice.buyer.address.country}`,
-        `NIP: ${invoice.buyer.nip}`
+        `NIP: ${invoice.buyer.nip}`,
     ];
     doc.text(buyer_lines.join('\n'), cols[1], position);
     return position + 50;
@@ -315,7 +315,7 @@ const header = (doc, position, invoice) => {
     doc.fontSize(label_font_size).font(regular_font).text('Issue date', cols[2], position);
     position += label_font_size;
     doc.fontSize(base_font_size).font(bold_font).text(issue_date_text, cols[1], position, {
-        align: 'right'
+        align: 'right',
     });
     return position + 20;
 };
