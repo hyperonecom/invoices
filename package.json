@@ -2,7 +2,9 @@
   "name": "@hyperone/invoices",
   "version": "0.1.0",
   "description": "PDF invoices generator",
-  "scripts": {},
+  "scripts": {
+    "postversion": "git push && git push --tags"
+  },
   "dependencies": {
     "moment": "^2.22.2",
     "pdfkit": "^0.8.3"
