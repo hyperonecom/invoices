@@ -330,14 +330,20 @@ function get_notes_lines(invoice) {
 const footer_content = (doc, position, invoice, options) => {
     doc.fontSize(label_font_size).text('Currency', cols[0], position);
     doc.fontSize(base_font_size).font(bold_font).text(`Waluta: ${options.currency || 'PLN'}`).font(regular_font);
-    position += 20;
+    position += 50;
 
-    doc.fontSize(label_font_size).text('Notes', cols[0], position);
-    position += 5;
-    doc.fontSize(base_font_size).font(bold_font).text('Uwagi:', cols[0], position).font(regular_font);
-    const notes_text = get_notes_lines(invoice).join('\n');
-    doc.font(regular_font).fontSize(base_font_size).text(notes_text);
-    position += doc.heightOfString(notes_text);
+    const notes_text = get_notes_lines(invoice);
+
+    if (notes_text.length > 0) {
+        doc.fontSize(label_font_size).text('Additional information', cols[0], position);
+        position += 5;
+        doc.fontSize(base_font_size).font(bold_font).text('Dodatkowe informacje:', cols[0], position).font(regular_font);
+        position += base_font_size + 4;
+        notes_text.forEach(note => {
+            doc.font(regular_font).fontSize(base_font_size).text(note, cols[0], position);
+            position += doc.heightOfString(note) + 4;
+        });
+    }
     return position;
 };
 
