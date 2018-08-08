@@ -12,7 +12,6 @@ const label_font_size = 7 - 2;
 const cols = [
     30, // first addressing column
     310, // second addressing column
-    421, // invoice date label];
 ];
 
 const write_row = (doc, position, start, values) => {
@@ -270,7 +269,9 @@ const table_content = (doc, position, invoice) => {
     return position;
 };
 
-const addressing = (doc, position, invoice) => {
+const stripLeft = (text, stripped_text) => text.startsWith(stripped_text) ? text.substring(stripped_text.length) : text;
+
+const addressing = (doc, position, invoice, options) => {
     doc.font(regular_font);
     doc.fontSize(label_font_size).text('Bill to', cols[1], position);
     doc.text('Seller', cols[0], position);
@@ -295,37 +296,60 @@ const addressing = (doc, position, invoice) => {
         `${invoice.buyer.company}`,
         `ul. ${invoice.buyer.address.street}`,
         `${invoice.buyer.address.zipcode} ${invoice.buyer.address.city}, ${invoice.buyer.address.country}`,
-        `NIP: ${invoice.buyer.nip}`,
+        `NIP: ${stripLeft(invoice.buyer.nip, options.stripBuyerCountry || 'PL')}`,
     ];
     doc.text(buyer_lines.join('\n'), cols[1], position);
     return position + 50;
 };
 
 const header = (doc, position, invoice) => {
-    // OBCIĄŻENIE ODWROTNE etc.
-    doc.font(regular_font).fontSize(base_font_size).text(invoice.invoiceInfo, cols[1]);
     // VAT Invoice
-    doc.fontSize(base_font_size).text('VAT Invoice', {align: 'right'});
-
+    doc.fontSize(base_font_size).text('VAT Invoice', cols[1]);
     // Faktura VAT
-    doc.fontSize(base_font_size + 7).font(bold_font).text(`Faktura VAT\n${invoice.invoiceNo}`, {align: 'right'});
+    doc.fontSize(base_font_size + 7).font(bold_font).text(`Faktura VAT\n${invoice.invoiceNo}`, cols[1]);
 
     const issue_date_text = `Data wystawienia: ${moment(invoice.issueDate).format('YYYY-MM-DD')}`;
     position += 80;
-    doc.fontSize(label_font_size).font(regular_font).text('Issue date', cols[2], position);
+    doc.fontSize(label_font_size).font(regular_font).text('Issue date', cols[1], position);
     position += label_font_size;
-    doc.fontSize(base_font_size).font(bold_font).text(issue_date_text, cols[1], position, {
-        align: 'right',
-    });
+    doc.fontSize(base_font_size).font(bold_font).text(issue_date_text, cols[1], position);
     return position + 20;
 };
 
-const footer = (doc, position, invoice, currency) => {
+function get_notes_lines(invoice) {
+    let notes_lines = [];
+    if (invoice.invoiceInfo) {
+        notes_lines.push(invoice.invoiceInfo)
+    }
+    if (invoice.notes) {
+        notes_lines.push(...invoice.notes)
+    }
+    return notes_lines;
+}
+
+const footer_content = (doc, position, invoice, options) => {
     doc.fontSize(label_font_size).text('Currency', cols[0], position);
-    doc.fontSize(base_font_size).font(bold_font).text(`Waluta: ${currency}`);
+    doc.fontSize(base_font_size).font(bold_font).text(`Waluta: ${options.currency || 'PLN'}`).font(regular_font);
+    position += 20;
+
+    doc.fontSize(label_font_size).text("Notes", cols[0], position);
+    position += 5;
+    doc.fontSize(base_font_size).font(bold_font).text("Uwagi:", cols[0], position).font(regular_font);
+    const notes_text = get_notes_lines(invoice).join("\n");
+    doc.font(regular_font).fontSize(base_font_size).text(notes_text);
+    position += doc.heightOfString(notes_text);
+    return position;
 };
 
-module.exports = (invoice, currency, output_stream) => {
+const footer_page = (doc, position, invoice, options) => {
+    doc.text(options.footer, 0, doc.page.maxY() - doc.heightOfString(options.footer), {
+        align: 'center'
+    });
+    return position;
+};
+
+
+module.exports = (invoice, output_stream, options) => {
 
     const doc = new PDFDocument({ size: 'A4', autoFirstPage: true });
 
@@ -337,10 +361,12 @@ module.exports = (invoice, currency, output_stream) => {
     let position = 50;
     position = header(doc, position, invoice);
     position += 50;
-    position = addressing(doc, position, invoice);
+    position = addressing(doc, position, invoice, options);
     position += 50;
     position = table_content(doc, position, invoice);
     position += 50;
-    footer(doc, position, invoice, currency);
+    position = footer_content(doc, position, invoice, options);
+    footer_page(doc, position, invoice, options);
+
     doc.end();
 };
