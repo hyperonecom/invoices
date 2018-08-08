@@ -327,7 +327,7 @@ function get_notes_lines(invoice) {
     return notes_lines;
 }
 
-const footer_content = (doc, position, invoice, options) => {
+const additional_information = (doc, position, invoice, options) => {
     doc.fontSize(label_font_size).text('Currency', cols[0], position);
     doc.fontSize(base_font_size).font(bold_font).text(`Waluta: ${options.currency || 'PLN'}`).font(regular_font);
     position += 50;
@@ -371,7 +371,7 @@ module.exports = (invoice, output_stream, options) => {
     position += 50;
     position = table_content(doc, position, invoice);
     position += 50;
-    position = footer_content(doc, position, invoice, options);
+    position = additional_information(doc, position, invoice, options);
     footer_page(doc, position, invoice, options);
 
     doc.end();
