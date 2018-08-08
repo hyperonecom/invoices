@@ -3,14 +3,18 @@
   "version": "0.1.0",
   "description": "PDF invoices generator",
   "scripts": {
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "lint": "eslint ."
   },
   "dependencies": {
     "moment": "^2.22.2",
     "pdfkit": "^0.8.3"
   },
   "main": "index.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "@hyperone/eslint-config": "^1.0.3",
+    "eslint": "^5.3.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hyperonecom/invoices.git"
