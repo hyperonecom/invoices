@@ -347,9 +347,19 @@ const additional_information = (doc, position, invoice, options) => {
     return position;
 };
 
-const footer_page = (doc, position, invoice, options) => {
-    doc.text(options.footer, 0, doc.page.maxY() - doc.heightOfString(options.footer), {
-        align: 'center',
+const page_footer = (doc, position, invoice, options) => {
+
+    console.log(`maxY: ${doc.page.maxY()}`);
+    console.log(`heightOfString: ${doc.heightOfString(options.footer.text)}`);
+    console.log(`doc.page.height - doc.page.margins.bottom: ${doc.page.height - doc.page.margins.bottom}`);
+    console.log(doc.page.margins);
+    console.log(doc.page.height);
+
+    options.footer.align = undefined;
+
+    doc.text(options.footer.text, cols[0], doc.page.maxY() - doc.heightOfString(options.footer.text), {
+        align: options.footer.align,
+        width: doc.page.width - cols[0] - cols[0]
     });
     return position;
 };
@@ -372,7 +382,11 @@ module.exports = (invoice, output_stream, options) => {
     position = table_content(doc, position, invoice);
     position += 50;
     position = additional_information(doc, position, invoice, options);
-    footer_page(doc, position, invoice, options);
+
+    if (options.footer) {
+        page_footer(doc, position, invoice, options);
+    }
+
 
     doc.end();
 };
