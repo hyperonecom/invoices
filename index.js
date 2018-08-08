@@ -317,12 +317,12 @@ const header = (doc, position, invoice) => {
 };
 
 function get_notes_lines(invoice) {
-    let notes_lines = [];
+    const notes_lines = [];
     if (invoice.invoiceInfo) {
-        notes_lines.push(invoice.invoiceInfo)
+        notes_lines.push(invoice.invoiceInfo);
     }
     if (invoice.notes) {
-        notes_lines.push(...invoice.notes)
+        notes_lines.push(...invoice.notes);
     }
     return notes_lines;
 }
@@ -332,10 +332,10 @@ const footer_content = (doc, position, invoice, options) => {
     doc.fontSize(base_font_size).font(bold_font).text(`Waluta: ${options.currency || 'PLN'}`).font(regular_font);
     position += 20;
 
-    doc.fontSize(label_font_size).text("Notes", cols[0], position);
+    doc.fontSize(label_font_size).text('Notes', cols[0], position);
     position += 5;
-    doc.fontSize(base_font_size).font(bold_font).text("Uwagi:", cols[0], position).font(regular_font);
-    const notes_text = get_notes_lines(invoice).join("\n");
+    doc.fontSize(base_font_size).font(bold_font).text('Uwagi:', cols[0], position).font(regular_font);
+    const notes_text = get_notes_lines(invoice).join('\n');
     doc.font(regular_font).fontSize(base_font_size).text(notes_text);
     position += doc.heightOfString(notes_text);
     return position;
@@ -343,7 +343,7 @@ const footer_content = (doc, position, invoice, options) => {
 
 const footer_page = (doc, position, invoice, options) => {
     doc.text(options.footer, 0, doc.page.maxY() - doc.heightOfString(options.footer), {
-        align: 'center'
+        align: 'center',
     });
     return position;
 };
