@@ -1,9 +1,10 @@
 'use strict';
+
 const fs = require('fs');
 const invoice_generator = require('./index');
 
 if (process.argv.length < 3) {
-    console.log('node example.js [invoice.json] [output.pdf]');
+    console.log('node example.js <invoice.json> <output.pdf>');
     process.exit(2);
 }
 
