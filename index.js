@@ -190,11 +190,13 @@ const table_content = (doc, position, invoice) => {
         },
         {
             label: 'Cena netto',
-            label_en: 'Price net',
+            label_en: 'Net price',
+            align: 'right',
         },
         {
             label: 'Wartość netto',
-            label_en: 'Value net',
+            label_en: 'Net value',
+            align: 'right',
         },
         {
             label: 'Stawka VAT',
@@ -203,10 +205,11 @@ const table_content = (doc, position, invoice) => {
         {
             label: 'Kwota VAT',
             label_en: 'VAT Amount',
+            align: 'right',
         },
         {
             label: 'Wartość brutto',
-            label_en: 'Value gross',
+            label_en: 'Gross value',
             align: 'right',
         },
     ];
