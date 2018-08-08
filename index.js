@@ -342,8 +342,8 @@ const footer_content = (doc, position, invoice, options) => {
 };
 
 const page_footer = (doc, position, invoice, options) => {
-    doc.text(options.footer, 0, doc.page.maxY() - doc.heightOfString(options.footer), {
-        align: 'center',
+    doc.text(options.footer.text, 0, doc.page.maxY() - doc.heightOfString(options.footer.text), {
+        align: options.footer.align,
     });
     return position;
 };
