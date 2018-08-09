@@ -291,17 +291,23 @@ const table_content = (doc, position, invoice) => {
 
 const stripLeft = (text, stripped_text) => text.startsWith(stripped_text) ? text.substring(stripped_text.length) : text;
 
+const twoLangHeader = (doc, primary, secondary, options) => {
+
+    options.fontSizeLabel   = options.fontSizeLabel || label_font_size;
+    options.fontSizePrimary = options.fontSizePrimary || base_font_size;
+
+    doc.fontSize(options.fontSizeLabel).font(regular_font).text(secondary, options.x, options.y);
+    doc.fontSize(options.fontSizePrimary).font(bold_font).text(primary, options.x, options.y + label_font_size, options);
+
+    return options.y + label_font_size + base_font_size + 2;
+};
+
 const addressing = (doc, position, invoice, options) => {
+    twoLangHeader(doc, 'Sprzedawca:', 'Seller', { x: cols[0], y: position});
+    position = twoLangHeader(doc, 'Nabywca:', 'Bill to', { x: cols[1], y: position});
+
     doc.font(regular_font);
-    doc.fontSize(label_font_size).text('Bill to', cols[1], position);
-    doc.text('Seller', cols[0], position);
 
-    position += label_font_size;
-
-    doc.fontSize(base_font_size).font(bold_font).text('Nabywca:', cols[1], position);
-    doc.text('Sprzedawca: ', cols[0], position).font(regular_font);
-
-    position += base_font_size + 2;
     // dane sprzedawcy
     const seller_lines = [
         `${invoice.seller.company}`,
@@ -323,16 +329,20 @@ const addressing = (doc, position, invoice, options) => {
 };
 
 const header = (doc, position, invoice) => {
-    // VAT Invoice
-    doc.fontSize(base_font_size).text('VAT Invoice', cols[1]);
-    // Faktura VAT
-    doc.fontSize(base_font_size + 7).font(bold_font).text(`Faktura VAT\n${invoice.invoiceNo}`, cols[1]);
+    twoLangHeader(doc, 'Faktura VAT', 'VAT Invoice', {
+        x: cols[1],
+        y: position,
+        fontSizePrimary: base_font_size + 7,
+        fontSizeLabel: base_font_size}
+    );
+
+    doc.fontSize(base_font_size + 7).font(bold_font).text(invoice.invoiceNo, cols[1]);
 
     position += 80;
-    doc.fontSize(label_font_size).font(regular_font).text('Issue date', cols[1], position);
-    position += label_font_size;
-    doc.fontSize(base_font_size).font(bold_font).text('Data wystawienia:', cols[1], position, {lineBreak : false});
+
+    twoLangHeader(doc, 'Data wystawienia:', 'Issue date', { x: cols[1], y: position, lineBreak: false});
     doc.font(regular_font).text(moment(invoice.issueDate).format('YYYY-MM-DD'), doc.x + 5);
+
     return position + 20;
 };
 
@@ -348,17 +358,17 @@ function get_notes_lines(invoice) {
 }
 
 const additional_information = (doc, position, invoice, options) => {
-    doc.fontSize(label_font_size).text('Currency', cols[0], position);
-    doc.fontSize(base_font_size).font(bold_font).text(`Waluta: ${options.currency || 'PLN'}`).font(regular_font);
+    twoLangHeader(doc, 'Waluta:', 'Currency', { x: cols[0], y: position, lineBreak: false});
+    doc.font(regular_font).text(options.currency || 'PLN', doc.x + 5);
+
     position += 50;
 
     const notes_text = get_notes_lines(invoice);
 
     if (notes_text.length > 0) {
-        doc.fontSize(label_font_size).text('Additional information', cols[0], position);
-        position += 5;
-        doc.fontSize(base_font_size).font(bold_font).text('Dodatkowe informacje:', cols[0], position).font(regular_font);
-        position += base_font_size + 4;
+
+        position = twoLangHeader(doc, 'Dodatkowe informacje:', 'Additional information', {x: cols[0], y: position});
+
         notes_text.forEach(note => {
             doc.font(regular_font).fontSize(base_font_size).text(note, cols[0], position);
             position += doc.heightOfString(note) + 4;
