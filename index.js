@@ -14,6 +14,23 @@ const cols = [
     310, // second addressing column
 ];
 
+const document_configuration = config => {
+
+    const doc = new PDFDocument({ size: 'A4', autoFirstPage: true });
+
+    // page margins
+    const margins = config.options.margins || { left: 30, right: 30, bottom: 44 };
+    doc.page.margins = Object.assign({}, doc.page.margins, margins);
+
+    // register fonts
+    doc.registerFont(regular_font, path.join(__dirname, 'fonts', `${regular_font}.ttf`));
+    doc.registerFont(bold_font, path.join(__dirname, 'fonts', `${bold_font}.ttf`));
+
+    doc.pipe(config.output_stream);
+
+    return doc;
+};
+
 const write_row = (doc, position, start, values) => {
     let padding = start;
     const heights = [];
@@ -190,11 +207,13 @@ const table_content = (doc, position, invoice) => {
         },
         {
             label: 'Cena netto',
-            label_en: 'Price net',
+            label_en: 'Net price',
+            align: 'right',
         },
         {
             label: 'Wartość netto',
-            label_en: 'Value net',
+            label_en: 'Net value',
+            align: 'right',
         },
         {
             label: 'Stawka VAT',
@@ -203,10 +222,11 @@ const table_content = (doc, position, invoice) => {
         {
             label: 'Kwota VAT',
             label_en: 'VAT Amount',
+            align: 'right',
         },
         {
             label: 'Wartość brutto',
-            label_en: 'Value gross',
+            label_en: 'Gross value',
             align: 'right',
         },
     ];
@@ -308,11 +328,11 @@ const header = (doc, position, invoice) => {
     // Faktura VAT
     doc.fontSize(base_font_size + 7).font(bold_font).text(`Faktura VAT\n${invoice.invoiceNo}`, cols[1]);
 
-    const issue_date_text = `Data wystawienia: ${moment(invoice.issueDate).format('YYYY-MM-DD')}`;
     position += 80;
     doc.fontSize(label_font_size).font(regular_font).text('Issue date', cols[1], position);
     position += label_font_size;
-    doc.fontSize(base_font_size).font(bold_font).text(issue_date_text, cols[1], position);
+    doc.fontSize(base_font_size).font(bold_font).text('Data wystawienia:', cols[1], position, {lineBreak : false});
+    doc.font(regular_font).text(moment(invoice.issueDate).format('YYYY-MM-DD'), doc.x + 5);
     return position + 20;
 };
 
@@ -327,17 +347,23 @@ function get_notes_lines(invoice) {
     return notes_lines;
 }
 
-const footer_content = (doc, position, invoice, options) => {
+const additional_information = (doc, position, invoice, options) => {
     doc.fontSize(label_font_size).text('Currency', cols[0], position);
     doc.fontSize(base_font_size).font(bold_font).text(`Waluta: ${options.currency || 'PLN'}`).font(regular_font);
-    position += 20;
+    position += 50;
 
-    doc.fontSize(label_font_size).text('Notes', cols[0], position);
-    position += 5;
-    doc.fontSize(base_font_size).font(bold_font).text('Uwagi:', cols[0], position).font(regular_font);
-    const notes_text = get_notes_lines(invoice).join('\n');
-    doc.font(regular_font).fontSize(base_font_size).text(notes_text);
-    position += doc.heightOfString(notes_text);
+    const notes_text = get_notes_lines(invoice);
+
+    if (notes_text.length > 0) {
+        doc.fontSize(label_font_size).text('Additional information', cols[0], position);
+        position += 5;
+        doc.fontSize(base_font_size).font(bold_font).text('Dodatkowe informacje:', cols[0], position).font(regular_font);
+        position += base_font_size + 4;
+        notes_text.forEach(note => {
+            doc.font(regular_font).fontSize(base_font_size).text(note, cols[0], position);
+            position += doc.heightOfString(note) + 4;
+        });
+    }
     return position;
 };
 
@@ -351,12 +377,11 @@ const page_footer = (doc, position, invoice, options) => {
 
 module.exports = (invoice, output_stream, options) => {
 
-    const doc = new PDFDocument({ size: 'A4', autoFirstPage: true });
-
-    doc.registerFont(regular_font, path.join(__dirname, 'fonts', `${regular_font}.ttf`));
-    doc.registerFont(bold_font, path.join(__dirname, 'fonts', `${bold_font}.ttf`));
-
-    doc.pipe(output_stream);
+    const doc = document_configuration({
+        invoice: invoice,
+        output_stream: output_stream,
+        options: options,
+    });
 
     let position = 50;
     position = header(doc, position, invoice);
@@ -365,7 +390,7 @@ module.exports = (invoice, output_stream, options) => {
     position += 50;
     position = table_content(doc, position, invoice);
     position += 50;
-    position = footer_content(doc, position, invoice, options);
+    position = additional_information(doc, position, invoice, options);
 
     if (options.footer) {
         page_footer(doc, position, invoice, options);
