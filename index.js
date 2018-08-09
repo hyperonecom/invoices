@@ -22,6 +22,10 @@ const document_configuration = config => {
     doc.registerFont(regular_font, path.join(__dirname, 'fonts', `${regular_font}.ttf`));
     doc.registerFont(bold_font, path.join(__dirname, 'fonts', `${bold_font}.ttf`));
 
+    if (config.options.info) {
+        doc.info = Object.assign({}, doc.info, config.options.info);
+    }
+
     doc.pipe(config.output_stream);
 
     return doc;
