@@ -16,11 +16,7 @@ const cols = [
 
 const document_configuration = config => {
 
-    const doc = new PDFDocument({ size: 'A4', autoFirstPage: true });
-
-    // page margins
-    const margins = config.options.margins || { left: 30, right: 30, bottom: 44 };
-    doc.page.margins = Object.assign({}, doc.page.margins, margins);
+    const doc = new PDFDocument({ size: 'A4', autoFirstPage: false });
 
     // register fonts
     doc.registerFont(regular_font, path.join(__dirname, 'fonts', `${regular_font}.ttf`));
@@ -374,14 +370,13 @@ const page_footer = (doc, position, invoice, options) => {
     return position;
 };
 
+const add_invoice = (doc, invoice, options) => {
 
-module.exports = (invoice, output_stream, options) => {
+    doc.addPage();
 
-    const doc = document_configuration({
-        invoice: invoice,
-        output_stream: output_stream,
-        options: options,
-    });
+    // page margins
+    const margins = options.margins || { left: 30, right: 30, bottom: 44 };
+    doc.page.margins = Object.assign({}, doc.page.margins, margins);
 
     let position = 50;
     position = header(doc, position, invoice);
@@ -395,6 +390,21 @@ module.exports = (invoice, output_stream, options) => {
     if (options.footer) {
         page_footer(doc, position, invoice, options);
     };
+};
+
+module.exports = (invoice, output_stream, options) => {
+
+    const doc = document_configuration({
+        invoice: invoice,
+        output_stream: output_stream,
+        options: options,
+    });
+
+    if (!Array.isArray(invoice)) {
+        invoice = [ invoice ];
+    }
+
+    invoice.forEach(i => add_invoice(doc, i, options));
 
     doc.end();
 };
