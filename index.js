@@ -308,11 +308,11 @@ const header = (doc, position, invoice) => {
     // Faktura VAT
     doc.fontSize(base_font_size + 7).font(bold_font).text(`Faktura VAT\n${invoice.invoiceNo}`, cols[1]);
 
-    const issue_date_text = `Data wystawienia: ${moment(invoice.issueDate).format('YYYY-MM-DD')}`;
     position += 80;
     doc.fontSize(label_font_size).font(regular_font).text('Issue date', cols[1], position);
     position += label_font_size;
-    doc.fontSize(base_font_size).font(bold_font).text(issue_date_text, cols[1], position);
+    doc.fontSize(base_font_size).font(bold_font).text('Data wystawienia:', cols[1], position, {lineBreak : false});
+    doc.font(regular_font).text(moment(invoice.issueDate).format('YYYY-MM-DD'), doc.x + 5);
     return position + 20;
 };
 
