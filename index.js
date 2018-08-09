@@ -14,6 +14,23 @@ const cols = [
     310, // second addressing column
 ];
 
+const document_configuration = config => {
+
+    const doc = new PDFDocument({ size: 'A4', autoFirstPage: true });
+
+    // page margins
+    const margins = config.options.margins || { left: 30, right: 30, bottom: 44 };
+    doc.page.margins = Object.assign({}, doc.page.margins, margins);
+
+    // register fonts
+    doc.registerFont(regular_font, path.join(__dirname, 'fonts', `${regular_font}.ttf`));
+    doc.registerFont(bold_font, path.join(__dirname, 'fonts', `${bold_font}.ttf`));
+
+    doc.pipe(config.output_stream);
+
+    return doc;
+};
+
 const write_row = (doc, position, start, values) => {
     let padding = start;
     const heights = [];
@@ -357,12 +374,11 @@ const footer_page = (doc, position, invoice, options) => {
 
 module.exports = (invoice, output_stream, options) => {
 
-    const doc = new PDFDocument({ size: 'A4', autoFirstPage: true });
-
-    doc.registerFont(regular_font, path.join(__dirname, 'fonts', `${regular_font}.ttf`));
-    doc.registerFont(bold_font, path.join(__dirname, 'fonts', `${bold_font}.ttf`));
-
-    doc.pipe(output_stream);
+    const doc = document_configuration({
+        invoice: invoice,
+        output_stream: output_stream,
+        options: options,
+    });
 
     let position = 50;
     position = header(doc, position, invoice);
