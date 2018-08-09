@@ -371,7 +371,7 @@ module.exports = (invoice, output_stream, options) => {
     const doc = document_configuration({
         invoice: invoice,
         output_stream: output_stream,
-        options: options
+        options: options,
     });
 
     let position = 50;
