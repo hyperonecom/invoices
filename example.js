@@ -25,5 +25,9 @@ invoice_generator(invoice, output_stream, {
             'Nr KRS: 0000000000 • REGON: 000000000 • NIP: 000-00-00-000',
     },
     stripBuyerCountry: 'PL',
+    info: {
+        Producer: 'rbx platform',
+        Creator: 'invoice module',
+    },
 });
 console.log(`Saved invoice from '${input_filename}' to '${output_filename}'`);
