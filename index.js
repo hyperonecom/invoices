@@ -337,13 +337,25 @@ const header = (doc, position, invoice) => {
     );
 
     doc.fontSize(base_font_size + 7).font(bold_font).text(invoice.invoiceNo, cols[1]);
-
-    position += 80;
+    position += 60;
 
     twoLangHeader(doc, 'Data wystawienia:', 'Issue date', { x: cols[1], y: position, lineBreak: false});
     doc.font(regular_font).text(moment(invoice.issueDate).format('YYYY-MM-DD'), doc.x + 5);
+    position += 20;
 
-    return position + 20;
+    if (invoice.paymentDate) {
+        twoLangHeader(doc, 'Data otrzymania zapłaty:', 'Date of receipt of payment', { x: cols[1], y: position, lineBreak: false});
+        doc.font(regular_font).text(moment(invoice.paymentDate).format('YYYY-MM-DD'), doc.x + 5);
+        position += 20;
+    }
+
+    if (invoice.dueDate) {
+        twoLangHeader(doc, 'Termin płatności:', 'Due date', { x: cols[1], y: position, lineBreak: false});
+        doc.font(regular_font).text(moment(invoice.dueDate).format('YYYY-MM-DD'), doc.x + 5);
+        position += 20;
+    }
+
+    return position + 10;
 };
 
 function get_notes_lines(invoice) {
