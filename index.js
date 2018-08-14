@@ -373,6 +373,12 @@ const additional_information = (doc, position, invoice, options) => {
     twoLangHeader(doc, 'Waluta:', 'Currency', { x: cols[0], y: position, lineBreak: false});
     doc.font(regular_font).text(options.currency || 'PLN', doc.x + 5);
 
+    if (invoice.paymentMethod) {
+        position += 20;
+        twoLangHeader(doc, 'Sposób zapłaty:', 'Payment method', { x: cols[0], y: position, lineBreak: false});
+        doc.font(regular_font).text(invoice.paymentMethod || 'PLN', doc.x + 5);
+    }
+
     position += 50;
 
     const notes_text = get_notes_lines(invoice);
