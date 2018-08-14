@@ -329,7 +329,21 @@ const addressing = (doc, position, invoice, options) => {
 };
 
 const header = (doc, position, invoice) => {
-    twoLangHeader(doc, 'Faktura VAT', 'VAT Invoice', {
+
+    const documentTypes = {
+        invoice: {
+            primary: 'Faktura VAT',
+            label: 'VAT Invoice',
+        },
+        proforma: {
+            primary: 'Proforma',
+            label: 'Pro forma',
+        },
+    };
+
+    const docTitle = documentTypes[invoice.documentType] || documentTypes.invoice;
+
+    twoLangHeader(doc, docTitle.primary, docTitle.label, {
         x: cols[1],
         y: position,
         fontSizePrimary: base_font_size + 7,
