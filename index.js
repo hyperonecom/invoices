@@ -390,7 +390,7 @@ const additional_information = (doc, position, invoice, options) => {
     if (invoice.seller && invoice.seller.iban) {
         position += 20;
         twoLangHeader(doc, 'Numer rachunku bankowego:', 'Bank account number', { x: cols[0], y: position, lineBreak: false});
-        doc.font(regular_font).text(invoice.seller.iban, doc.x + 5);
+        doc.font(regular_font).text(invoice.seller.iban.match(/..../g).join(' '), doc.x + 5);
     }
 
     if (invoice.paymentMethod) {
