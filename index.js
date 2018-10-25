@@ -339,6 +339,10 @@ const header = (doc, position, invoice) => {
             primary: 'Proforma',
             label: 'Pro forma',
         },
+        invoice_duplicate: {
+            primary: 'Faktura VAT - DUPLIKAT',
+            label: 'VAT Invoice - DUPLICATE',
+        },
     };
 
     const docTitle = documentTypes[invoice.documentType] || documentTypes.invoice;
@@ -385,9 +389,6 @@ function get_notes_lines(invoice) {
     }
     if (invoice.notes) {
         notes_lines.push(...invoice.notes);
-    }
-    if (invoice.duplicateDate) {
-        notes_lines.push('DUPLIKAT');
     }
     return notes_lines;
 }
