@@ -357,6 +357,12 @@ const header = (doc, position, invoice) => {
     doc.font(regular_font).text(moment(invoice.issueDate).format('YYYY-MM-DD'), doc.x + 5);
     position += 20;
 
+    if (invoice.duplicateDate) {
+        twoLangHeader(doc, 'Data wystawienia duplikatu:', 'Duplicate issue date', { x: cols[1], y: position, lineBreak: false});
+        doc.font(regular_font).text(moment(invoice.duplicateDate).format('YYYY-MM-DD'), doc.x + 5);
+        position += 20;
+    }
+
     if (invoice.paymentDate) {
         twoLangHeader(doc, 'Data otrzymania zapłaty:', 'Date of receipt of payment', { x: cols[1], y: position, lineBreak: false});
         doc.font(regular_font).text(moment(invoice.paymentDate).format('YYYY-MM-DD'), doc.x + 5);
@@ -379,6 +385,9 @@ function get_notes_lines(invoice) {
     }
     if (invoice.notes) {
         notes_lines.push(...invoice.notes);
+    }
+    if (invoice.duplicateDate) {
+        notes_lines.push('DUPLIKAT');
     }
     return notes_lines;
 }
