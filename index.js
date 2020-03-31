@@ -451,7 +451,7 @@ const add_invoice = (doc, invoice, options) => {
 
     if (options.footer) {
         page_footer(doc, position, invoice, options);
-    };
+    }
 };
 
 module.exports = (invoice, output_stream, options) => {
