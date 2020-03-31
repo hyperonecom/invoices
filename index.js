@@ -23,7 +23,7 @@ const document_configuration = config => {
     doc.registerFont(bold_font, path.join(__dirname, 'fonts', `${bold_font}.ttf`));
 
     if (config.options.info) {
-        doc.info = Object.assign({}, doc.info, config.options.info);
+        doc.info = { ...doc.info, ...config.options.info };
     }
 
     doc.pipe(config.output_stream);
@@ -438,7 +438,7 @@ const add_invoice = (doc, invoice, options) => {
 
     // page margins
     const margins = options.margins || { left: 30, right: 30, bottom: 44 };
-    doc.page.margins = Object.assign({}, doc.page.margins, margins);
+    doc.page.margins = { ...doc.page.margins, ...margins };
 
     let position = 50;
     position = header(doc, position, invoice);
