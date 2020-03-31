@@ -7,13 +7,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "moment": "^2.22.2",
+    "moment": "^2.24.0",
     "pdfkit": "^0.8.3"
   },
   "main": "index.js",
   "devDependencies": {
-    "@hyperone/eslint-config": "^1.0.3",
-    "eslint": "^5.7.0"
+    "@hyperone/eslint-config": "^1.0.5",
+    "eslint": "^5.16.0"
   },
   "repository": {
     "type": "git",
