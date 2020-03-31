@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "moment": "^2.24.0",
-    "pdfkit": "^0.8.3"
+    "pdfkit": "^0.11.0"
   },
   "main": "index.js",
   "devDependencies": {
