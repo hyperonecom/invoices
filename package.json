@@ -1,6 +1,6 @@
 {
   "name": "@hyperone/invoices",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "PDF invoices generator",
   "scripts": {
     "postversion": "git push && git push --tags",
