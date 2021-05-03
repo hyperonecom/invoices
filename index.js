@@ -87,11 +87,33 @@ const table_header = (doc, position, header) => {
     return position;
 };
 
+const vat_description = (row, kind) => {
+    if (kind == 'label' && row.vatRate == '-1') {
+        return 'Wartość usług nie podlegających VAT';
+    } else if (kind == 'label' && row.vatRate.toUpperCase() == 'ZW') {
+        return 'Wartość usług zwolnionych z VAT';
+    } else if (kind == 'label') {
+        return `Wartość usług podlegających VAT ${row.vatRate}%`;
+    } else if (kind == 'label_en' && row.vatRate == '-1') {
+        return 'Wartość usług nie podlegających VAT';
+    } else if (kind == 'label_en' && row.vatRate.toUpperCase() == 'ZW') {
+        return 'Total charges exempt from VAT';
+    } else if (kind == 'label_en') {
+        return `Wartość usług podlegających VAT ${row.vatRate}%`;
+    } else if (kind == 'value' && row.vatRate == '-1') {
+        return 'NP';
+    } else if (kind == 'value' && row.vatRate.toUpperCase() == 'ZW') {
+        return 'ZW';
+    } else if (kind == 'value') {
+        return `${row.vatRate} %`;
+    }
+    throw new Error('Unsupported kind');
+};
 const vat_summary_row = (doc, position, header, row) => {
     doc.fontSize(label_font_size);
     position = write_row(doc, position, cols[0], [
         {
-            text: row.vatRate === '-1' ? 'Total charges with no VAT' : `Total charges with ${row.vatRate}% VAT`,
+            text: vat_description(row, 'label_en'),
             width: array_sum(header.slice(0, 4).map(x => x.width || 60)),
             align: 'left',
         },
@@ -99,7 +121,7 @@ const vat_summary_row = (doc, position, header, row) => {
     doc.fontSize(base_font_size);
     const content = [
         {
-            text: row.vatRate === '-1' ? 'Wartość usług nie podlegających VAT' : `Wartość usług podlegających VAT ${row.vatRate}%`,
+            text: vat_description(row, 'label'),
             width: array_sum(header.slice(0, 4).map(x => x.width || 60)),
             align: 'left',
             bold: true,
@@ -110,7 +132,7 @@ const vat_summary_row = (doc, position, header, row) => {
             align: 'right',
         },
         {
-            text: row.vatRate === '-1' ? 'np' : `${row.vatRate} %`,
+            text: vat_description(row, 'value'),
             width: header[4].width,
             align: 'center',
         },
@@ -221,7 +243,7 @@ const table_content = (doc, position, invoice) => {
         },
         {
             label: 'Kwota VAT',
-            label_en: 'VAT Amount',
+            label_en: 'VAT amount',
             align: 'right',
         },
         {
@@ -257,7 +279,7 @@ const table_content = (doc, position, invoice) => {
                 align: 'right',
             },
             {
-                value: item.vatRate !== '-1' ? `${item.vatRate} %` : 'np',
+                value: vat_description(item, 'value'),
                 align: 'center',
             },
             {
@@ -334,6 +356,10 @@ const header = (doc, position, invoice) => {
         invoice: {
             primary: 'Faktura VAT',
             label: 'VAT Invoice',
+        },
+        invoice_vatless: {
+            primary: 'Faktura',
+            label: 'Invoice',
         },
         proforma: {
             primary: 'Proforma',
