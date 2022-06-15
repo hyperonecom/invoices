@@ -4,7 +4,8 @@
   "description": "PDF invoices generator",
   "scripts": {
     "postversion": "git push && git push --tags",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "publish": "npm publish --@hyperone:registry=https://registry.npmjs.org"
   },
   "dependencies": {
     "moment": "^2.29.3",
